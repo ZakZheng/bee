@@ -1,0 +1,126 @@
+<template>
+  <view class="container">
+    <view class="main-list" style="height: {{list_height.height}}px">
+      <list-type @tapItem.user="tapItem" :list.sync="typeList" />
+      <dish-list @addShoppingCart.user="addShoppingCart" :list.sync="dishList" class="dish-list"/>
+    </view>
+    <view class="footer">
+      <car-footer @addCar.user="addCar" @openConfirmOrder.user="openConfirmOrder" :total.sync="total"></car-footer>
+    </view>
+    <!-- <text class="info">{{mixin}}</text> -->
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import store from '../store'
+import { Axios } from '../utils/base'
+import md5 from 'blueimp-md5'
+import { GET_CATEGORY_LIST, GET_PRODUCT_LIST } from '../utils/url'
+import listType from '../components/listtype'
+import dishList from '../components/dishlist'
+import carFooter from '../components/carfooter'
+import testMixin from '../mixins/test'
+
+export default class Index extends wepy.page {
+  data = {
+    typeList: [],
+    dishList: [],
+    currentPage: 0,
+    list_height: {
+      height: Math.ceil(
+        store.state.windowHeight - store.state.windowWidth / 750 * 97
+      )
+    },
+    total: {
+      sale_price: 0,
+      price: 0
+    }
+  }
+  components = {
+    'list-type': listType,
+    'dish-list': dishList,
+    'car-footer': carFooter
+  }
+  watch = {
+    currentPage(id) {
+      let that = this
+      Axios({
+        url: GET_PRODUCT_LIST,
+        method: 'GET',
+        data: {
+          categoryId: id
+        }
+      }).then(res => {
+        that.dishList = res.data.list
+        that.$apply()
+      })
+    }
+  }
+  onLoad() {
+    console.log(md5('qq1258645603').toUpperCase())
+    let that = this
+    Axios({
+      url: GET_CATEGORY_LIST
+    }).then(res => {
+      that.typeList = res.data.list
+      that.currentPage = res.data.list[0].category_id
+      that.$apply()
+    })
+  }
+
+  onShow() {
+    this.$broadcast('sendData', store.state)
+  }
+
+  mixins = [testMixin]
+
+  methods = {
+    tapItem(item) {
+      let that = this
+      that.currentPage = item.currentTarget.dataset.id
+    },
+    addShoppingCart(item) {
+      this.$broadcast('openOption', item)
+    },
+    // 将当前编辑数据添加到store列表
+    addCar(itemData, number) {
+      // 清空总价格，防止循环添加
+      this.total.sale_price = 0
+      store.state.operatingInfo[itemData.product_id] = itemData.number
+      store.state.dishesNumber = 0
+      store.state.currentNumber = number
+      // 判断是否有为已有菜品, 有则修改数量
+      let flag = false
+      store.state.carList.forEach(item => {
+        if (item.product_id === itemData.product_id) {
+          if (item.activeIndex === itemData.activeIndex) {
+            item.number = itemData.number
+            flag = true
+          }
+        }
+      })
+      if (!flag) {
+        store.state.carList.push(itemData)
+      }
+      store.state.carList.forEach(item => {
+        store.state.dishesNumber += item.number
+        this.total.sale_price += item.price * item.number
+      })
+      this.$broadcast('sendData', store.state)
+    },
+    openConfirmOrder() {
+      if (!store.state.carList.length) {
+        wx.showToast({
+          title: '请选择菜品',
+          icon: 'loading'
+        })
+        return
+      }
+      wx.navigateTo({
+        url: 'confirm'
+      })
+    }
+  }
+}
+</script>

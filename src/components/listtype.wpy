@@ -1,0 +1,60 @@
+<style lang="less" scoped>
+.type-list {
+  height: 100%;
+  width: 180rpx;
+  background-color: #f2f2f2;
+  view {
+    text-align: center;
+    font-size: 30rpx;
+    color: #333;
+    line-height: 88rpx;
+    border-bottom: 1px solid #ddd;
+    &.active {
+      border-left: 4rpx solid #ff7200;
+      background-color: #fff;
+    }
+  }
+}
+</style>
+<template>
+  <scroll-view class="type-list" scroll-y="true">
+    <view wx:for-items="{{list}}"
+          wx:for-index="index"
+          wx:for-item="item"
+          id="{{index}}"
+          wx:key="index"
+          data-id="{{item.category_id}}"
+          @tap="tapItem"
+          class="{{activeIndex==index?'active':''}}"
+    >
+      {{item.category_name}}
+    </view>
+  </scroll-view>
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class listType extends wepy.component {
+  props = {
+    list: {
+      type: Array,
+      default: []
+    }
+  }
+  watch = {
+    list(val) {
+      console.log(val)
+    }
+  }
+  data = {
+    activeIndex: 0
+  }
+  methods = {
+    tapItem(event) {
+      this.activeIndex = event.currentTarget.id
+      this.$emit('tapItem', event)
+    }
+  }
+}
+</script>

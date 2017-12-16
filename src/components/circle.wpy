@@ -1,0 +1,37 @@
+<template>
+  <view class="circle-bar">
+    <view class="circle-item" wx:key="index" wx:for="{{20}}">
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class Circle extends wepy.component {
+}
+</script>
+
+<style lang="less" scoped>
+.circle-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  .circle-item {
+    width: 20rpx;
+    height: 20rpx;
+    position: relative;
+    border-radius: 50%;
+    background-color: #f2f2f2;
+    box-shadow: inset 1rpx 1rpx 5rpx rgba(0, 0, 0, 0.1);
+    &::after {
+      content: '';
+      left: 0;
+      right: 0;
+      height: 50%;
+      bottom: 0;
+      background-color: #f2f2f2;
+      position: absolute;
+    }
+  }
+}
+</style>

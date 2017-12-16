@@ -1,0 +1,205 @@
+<template>
+  <scroll-view scroll-y  class="dish-list">
+    <view wx:for="{{list}}" wx:key="index" class="list-item">
+      <view class="img-bar">
+        <image class="dish-img" id="{{index}}" lazy-load mode="aspectFill" binderror="replaceImg" src="{{item.image_url}}" />
+        <view class="sale-bar" wx:if="{{item.discount}}">
+          <image class="sale-img" src="/images/discount.png" />
+          <view class="sale-info">{{item.discount}}折</view>
+        </view>
+      </view>
+      <view class="list-item-info">
+        <view class="list-item-info-header">
+          <view class="list-item-info-title">
+            <view class="dish-title">
+              <image class="recommend-img" wx:if="{{item.recommended}}" src="/images/recommend.png" />
+              {{item.product_name}}
+            </view>
+          </view>
+          <view class="list-item-info-price">
+            <view class="old-price" wx:if="{{item.discount}}">￥ {{item.old_price}}</view>
+            <view class="new-price">￥ {{item.price}}</view>
+          </view>
+        </view>
+        <view class="list-item-info-footer">
+          <view class="list-item-info-introduce">
+            <view class="dish-introduce">介绍：{{item.description}}</view>
+          </view>
+          <view class="list-item-info-add">
+            <image @tap="addShoppingCart('{{item}}')" src="/images/plus.png" />
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { isEmptyObject } from '../utils/base'
+
+export default class dishList extends wepy.component {
+  props = {
+    list: {
+      type: Array,
+      default: []
+    },
+    operatingInfo: {}
+  }
+  events = {
+    // 获取购买数量记录
+    sendData(data) {
+      this.operatingInfo = data.operatingInfo
+    }
+  }
+  data = {}
+
+  watch = {
+    // 给每条数据添加默认购买数量
+    list(val) {
+      val.forEach((item, index) => {
+        item.number = item.number ? item.number : 1
+      })
+    }
+  }
+
+  methods = {
+    addShoppingCart(item) {
+      // 判断是否编辑过数量
+      if (!isEmptyObject(this.operatingInfo)) {
+        for (const key in this.operatingInfo) {
+          if (key === item.product_id + '') {
+            item.number = this.operatingInfo[key]
+          }
+        }
+      }
+      this.$emit('addShoppingCart', item)
+    },
+    // 替换加载错误图像为默认图
+    replaceImg(e) {
+      this.data.list[e.currentTarget.id].img_url = '/images/404.jpg'
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.dish-list {
+  height: 100%;
+  width: 570rpx;
+  view {
+    line-height: 1.5;
+  }
+  .list-item {
+    width: 520rpx;
+    margin: 30rpx auto;
+    font-size: 30rpx;
+    color: #333;
+    line-height: 80rpx;
+    box-shadow: 0 2px 5px #eee;
+    .img-bar {
+      width: 520rpx;
+      position: relative;
+      height: 316rpx;
+      .dish-img {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        left: 0;
+        height: 316rpx;
+      }
+      .sale-bar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 73rpx;
+        width: 70rpx;
+        background-size: 100%;
+        .sale-img {
+          width: 70rpx;
+          height: 73rpx;
+        }
+        .sale-info {
+          font-size: 28rpx;
+          color: #fff;
+          line-height: 73rpx;
+          position: absolute;
+          right: 12rpx;
+          top: -8rpx;
+        }
+      }
+    }
+    .list-item-info {
+      padding: 20rpx;
+      .list-item-info-header {
+        display: flex;
+        justify-content: space-between;
+      }
+      .list-item-info-footer {
+        display: flex;
+        justify-content: space-between;
+      }
+      .list-item-info-title {
+        flex: 7;
+        .recommend-img {
+          width: 30rpx;
+          height: 29rpx;
+          margin-right: 10rpx;
+        }
+        .dish-title {
+          font-size: 28rpx;
+          font-weight: bold;
+          color: #333;
+          width: 290rpx;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+      .list-item-info-price {
+        flex: 4;
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        .old-price {
+          font-size: 22rpx;
+          color: #999;
+          text-decoration: line-through;
+        }
+        .new-price {
+          color: #ff7e26;
+          font-size: 30rpx;
+        }
+      }
+      .list-item-info-introduce {
+        flex: 8;
+        flex-wrap: wrap;
+        margin-top: 20rpx;
+        .dish-introduce {
+          font-size: 24rpx;
+          color: #666;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: box;
+          display: -webkit-box;
+          line-clamp: 2;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+      }
+      .list-item-info-add {
+        flex: 2;
+        margin-top: 20rpx;
+        padding-right: 10rpx;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        image {
+          width: 50rpx;
+          height: 50rpx;
+        }
+      }
+    }
+  }
+}
+</style>

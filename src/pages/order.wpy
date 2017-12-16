@@ -1,0 +1,232 @@
+<template>
+  <view class="container">
+    <scroll-view scroll-y class="order-list" style="height: {{list_height.height}}px">
+      <view class="cpmform-item" @tap="openDetail">
+        <view class="order-taste">
+          <image class="tast-header-img" src="/images/120X120.jpg" />
+          <view class="taste-bar">
+            <view class="title-taste-bar">
+              <view class="title">{{'2017/11/01 00:00:00'}}</view>
+              <view class="taste">点菜数量：15</view>
+            </view>
+            <view class="price-bar">
+              <view class="price">
+                <view style="vertical-align:sub;">￥</view>{{'99.5'}}
+              </view>
+              <view class="discount">
+                <view style="vertical-align:sub;">￥</view>{{'109'}}
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="quantity-bar">
+          <image src="/images/make_sm.png"/>
+        </view>
+      </view>
+      <view class="cpmform-item">
+        <view class="order-taste">
+          <image class="tast-header-img" src="/images/120X120.jpg" />
+          <view class="taste-bar">
+            <view class="title-taste-bar">
+              <view class="title">{{'2017/11/01 00:00:00'}}</view>
+              <view class="taste">点菜数量：15</view>
+            </view>
+            <view class="price-bar">
+              <view class="price">
+                <view style="vertical-align:sub;">￥</view>{{'99.5'}}
+              </view>
+              <view class="discount">
+                <view style="vertical-align:sub;">￥</view>{{'109'}}
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="quantity-bar">
+          <image src="/images/make_sm.png"/>
+        </view>
+      </view>
+      <view class="cpmform-item">
+        <view class="order-taste">
+          <image class="tast-header-img" src="/images/120X120.jpg" />
+          <view class="taste-bar">
+            <view class="title-taste-bar">
+              <view class="title">{{'2017/11/01 00:00:00'}}</view>
+              <view class="taste">点菜数量：15</view>
+            </view>
+            <view class="price-bar">
+              <view class="price">
+                <view style="vertical-align:sub;">￥</view>{{'99.5'}}
+              </view>
+              <view class="discount">
+                <view style="vertical-align:sub;">￥</view>{{'109'}}
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="quantity-bar">
+          <image src="/images/make_sm.png"/>
+        </view>
+      </view>
+      <view class="cpmform-item">
+        <view class="order-taste">
+          <image class="tast-header-img" src="/images/120X120.jpg" />
+          <view class="taste-bar">
+            <view class="title-taste-bar">
+              <view class="title">{{'2017/11/01 00:00:00'}}</view>
+              <view class="taste">点菜数量：15</view>
+            </view>
+            <view class="price-bar">
+              <view class="price">
+                <view style="vertical-align:sub;">￥</view>{{'99.5'}}
+              </view>
+              <view class="discount">
+                <view style="vertical-align:sub;">￥</view>{{'109'}}
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="quantity-bar">
+          <image src="/images/OK.png"/>
+        </view>
+      </view>
+      <view class="cpmform-item">
+        <view class="order-taste">
+          <image class="tast-header-img" src="/images/120X120.jpg" />
+          <view class="taste-bar">
+            <view class="title-taste-bar">
+              <view class="title">{{'2017/11/01 00:00:00'}}</view>
+              <view class="taste">点菜数量：15</view>
+            </view>
+            <view class="price-bar">
+              <view class="price">
+                <view style="vertical-align:sub;">￥</view>{{'99.5'}}
+              </view>
+              <view class="discount">
+                <view style="vertical-align:sub;">￥</view>{{'109'}}
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="quantity-bar">
+          <image src="/images/OK.png"/>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import store from '../store'
+
+export default class order extends wepy.page {
+  config = {
+    backgroundviewStyle: 'light',
+    navigationBarBackgroundColor: '#252026',
+    navigationBarTitleview: '我的订单',
+    navigationBarviewStyle: '#ffffff'
+  }
+  data = {
+    list_height: {
+      height: store.state.windowHeight
+    }
+  }
+  methods = {
+    returnIndexPage() {
+      wx.navigateBack()
+    },
+    openDetail(id) {
+      wx.navigateTo({
+        url: 'orderdetail'
+      })
+    }
+  }
+}
+</script>
+
+<style lang="less">
+.order-list {
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  .cpmform-item {
+    padding: 20rpx 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .order-taste {
+      display: flex;
+      .tast-header-img {
+        width: 120rpx;
+        height: 120rpx;
+      }
+      .taste-bar {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        height: 120rpx;
+        margin-left: 20rpx;
+        .title-taste-bar {
+          .title {
+            color: #333;
+            font-size: 28rpx;
+            font-weight: bold;
+          }
+          .taste {
+            font-size: 24rpx;
+            color: #666;
+            margin-top: 20rpx;
+          }
+        }
+        .price-bar {
+          display: flex;
+          height: 24rpx;
+          .price {
+            display: flex;
+            color: #ff7e26;
+            font-size: 22rpx;
+          }
+          .discount {
+            display: flex;
+            margin-left: 10rpx;
+            color: #999;
+            font-size: 22rpx;
+          }
+        }
+      }
+    }
+    .quantity-bar {
+      width: 60rpx;
+      height: 60rpx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      image {
+        width: 60rpx;
+        height: 60rpx;
+      }
+    }
+  }
+  .total {
+    margin-top: 20rpx;
+    padding-bottom: 70rpx;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    .discounts {
+      color: #666;
+      font-size: 26rpx;
+    }
+    .view {
+      margin-left: 10rpx;
+      color: #666;
+      font-size: 26rpx;
+    }
+    .total-prices {
+      font-size: 46rpx;
+      color: #ff7200;
+      margin-left: 10rpx;
+    }
+  }
+}
+</style>

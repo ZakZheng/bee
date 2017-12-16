@@ -1,0 +1,84 @@
+<style lang="less">
+@import './style/base.less';
+.container {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  .main-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+  .footer {
+    height: 97rpx;
+  }
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import store from './store'
+import { Axios } from './utils/base'
+import { SET_LOGIN_DATA } from './utils/url'
+import 'wepy-async-function'
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/index',
+      'pages/order',
+      'pages/confirm',
+      'pages/confirmation',
+      'pages/orderdetail'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#252026',
+      navigationBarTitleText: '蜜蜂点单系统',
+      navigationBarTextStyle: '#ffffff'
+    }
+  }
+
+  globalData = {
+    userInfo: null
+  }
+
+  onLaunch() {
+    // 判断登录状态
+    wx.checkSession({
+      success: function() {},
+      fail: function() {
+        wx.login({
+          success: function(res) {
+            if (res.code) {
+              Axios({
+                url: SET_LOGIN_DATA,
+                method: 'POST',
+                data: {
+                  code: res.code
+                }
+              })
+            } else {
+              console.log('获取用户登录态失败！' + res.errMsg)
+            }
+          }
+        })
+      }
+    })
+    // 设置store的页面高宽和当前商户的accessToken
+    wx.getSystemInfo({
+      success: function(res) {
+        store.mutate(() => {
+          return {
+            windowHeight: res.windowHeight,
+            windowWidth: res.windowWidth,
+            accessToken: 'c5f72b8983cf167c8a226ac65e56b246'
+          }
+        })
+      }
+    })
+  }
+}
+</script>

@@ -1,0 +1,336 @@
+<template>
+  <view class="car-footer">
+    <view class="footer-default">
+      <view class="pull-left">
+        <image class="order-img" src="/images/order.png" @tap="openOrder"></image>
+        <view class="price-bar">
+          <view class="price">
+            ￥{{total.sale_price}}
+          </view>
+          <view class="discount">
+            已优惠 {{total.price}}
+          </view>
+        </view>
+      </view>
+      <button class="pull-right" @tap="openConfirmOrder" size="mini">选好了{{dishesNumber ? '('+dishesNumber+')': ''}}</button>
+    </view>
+    <view class="choose-taste-bar {{choose_taste_flag?'show':''}}">
+      <view class="choose-taste">
+        <view class="taste-header">
+          <image src="{{itemData.image_url}}" class="tast-header-img" />
+          <view class="tast-header-view">
+            <view class="title">
+              {{itemData.product_name}}
+            </view>
+            <view class="introduce">
+              介绍：{{itemData.description}}
+            </view>
+            <view class="sale-bar" wx:if="{{itemData.discount}}">
+              <image src="/images/discount.png" class="sale-img">
+              <view class="sale-view">{{itemData.discount}}折</view>
+            </view>
+          </view>
+        </view>
+        <view class="taste">
+          <view class="title">口味</view>
+          <view class="taste-bar">
+            <view wx:for="{{itemData.taste_list}}" 
+                  wx:key="index"
+                  id="{{index}}"
+                  @tap="tapItem"
+                  class="{{activeIndex==index?'active tast-item':'tast-item'}}" 
+            >
+              {{item.taste_name}}
+            </view>
+          </view>
+        </view>
+        <view class="quantity">
+          <view class="title">购买数量</view>
+          <view class="quantity-bar">
+            <image src="/images/reduce.png" @tap="numberOperation('reduce')"/>
+            <view class="quantity-view">{{number}}</view>
+            <image src="/images/plus.png" @tap="numberOperation('add')"/>
+          </view>
+        </view>
+      </view>
+      <view class="footer-taste">
+        <view class="pull-left">
+          <view class="price">
+            ￥{{number * (itemData.discount ? itemData.price * itemData.discount / 10 : itemData.price) }}
+          </view>
+          <view class="discount" wx:if="{{itemData.discount}}">
+            ￥{{number * itemData.price}}
+          </view>
+        </view>
+        <button class="pull-right" @tap="addCar" size="mini">确定</button>
+      </view>
+    </view>
+    <view class="mask {{choose_taste_flag?'show':''}}" @tap="closeOption"></view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+export default class carFooter extends wepy.component {
+  props = {
+    total: {
+      type: Object,
+      default: {}
+    }
+  }
+  data = {
+    itemData: {},
+    number: 1,
+    dishesNumber: 0,
+    choose_taste_flag: false,
+    activeIndex: '0'
+  }
+  events = {
+    openOption(item) {
+      this.number = item.number
+      this.itemData = item
+      this.choose_taste_flag = true
+    },
+    sendData(data) {
+      let count = 0
+      data.carList.forEach((item, index) => {
+        count += item.number
+      })
+      this.dishesNumber = count
+    }
+  }
+  methods = {
+    tapItem(event) {
+      this.activeIndex = event.currentTarget.id
+    },
+    closeOption() {
+      this.choose_taste_flag = false
+    },
+    addCar() {
+      this.itemData.number = this.number
+      this.itemData.activeIndex = this.activeIndex
+      this.choose_taste_flag = false
+      this.$emit('addCar', this.itemData)
+    },
+    numberOperation(type) {
+      if (type === 'add') {
+        this.number++
+      } else {
+        if (this.number > 0) {
+          this.number--
+        }
+      }
+    },
+    openOrder() {
+      wx.navigateTo({
+        url: 'order'
+      })
+    },
+    openConfirmOrder() {
+      this.$emit('openConfirmOrder')
+    }
+  }
+}
+</script>
+<style lang="less" scoped>
+.footer-default {
+  width: 100%;
+  height: 97rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  .pull-left {
+    display: flex;
+    align-items: center;
+    width: 500rpx;
+    line-height: 0;
+    .order-img {
+      width: 34rpx;
+      height: 36rpx;
+      padding: 30rpx;
+    }
+    .price-bar {
+      border-left: 1px solid #eee;
+      padding-left: 30rpx;
+      .price {
+        color: #ff7200;
+        font-size: 46rpx;
+      }
+      .discount {
+        margin-left: 10rpx;
+        font-size: 26rpx;
+        color: #666;
+      }
+    }
+  }
+  .pull-right {
+    font-size: 32rpx;
+    line-height: 97rpx;
+    border-radius: 0;
+    color: #fff;
+    background-color: #ff7200;
+    box-sizing: border-box;
+    margin: 0;
+    border: 0;
+    &::after {
+      content: none;
+    }
+  }
+}
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
+  z-index: 1;
+  &.show {
+    display: block;
+  }
+}
+.choose-taste-bar {
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transition: transform 0.5s;
+  transform: translatey(100%);
+  &.show {
+    transform: translateY(0);
+  }
+}
+.footer-taste {
+  width: 750rpx;
+  height: 97rpx;
+  background-color: #f2f2f2;
+  display: flex;
+  justify-content: space-between;
+  .pull-left {
+    display: flex;
+    align-items: center;
+    width: 550rpx;
+    line-height: 0;
+    .price {
+      color: #ff7200;
+      font-size: 46rpx;
+    }
+    .discount {
+      margin-left: 10rpx;
+      font-size: 26rpx;
+      color: #666;
+      view-decoration: line-through;
+    }
+  }
+  .pull-right {
+    width: 180rpx;
+    font-size: 32rpx;
+    line-height: 97rpx;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    color: #fff;
+    background-color: #ff7200;
+  }
+}
+.choose-taste {
+  position: relative;
+  width: 100%;
+  padding: 20rpx;
+  background-color: #fff;
+  box-sizing: border-box;
+  .taste-header {
+    display: flex;
+    width: 100%;
+    padding-bottom: 20rpx;
+    border-bottom: 1px solid #eeeeee;
+    .tast-header-img {
+      height: 120rpx;
+      width: 120rpx;
+    }
+    .tast-header-view {
+      margin-left: 20rpx;
+      width: 580rpx;
+      padding-top: 10rpx;
+      .title {
+        font-size: 28rpx;
+        color: #333;
+        font-weight: bold;
+      }
+      .introduce {
+        margin-top: 24rpx;
+        font-size: 24rpx;
+        color: #666;
+      }
+    }
+    .sale-bar {
+      position: absolute;
+      top: 0;
+      right: 23rpx;
+      height: 73rpx;
+      width: 70rpx;
+      .sale-img {
+        width: 70rpx;
+        height: 73rpx;
+      }
+      .sale-view {
+        font-size: 28rpx;
+        color: #fff;
+        line-height: 73rpx;
+        position: absolute;
+        right: 12rpx;
+        top: -8rpx;
+      }
+    }
+  }
+  .taste {
+    padding: 32rpx 0 40rpx;
+    border-bottom: 1px solid #eee;
+    .title {
+      font-size: 28rpx;
+      color: #666;
+    }
+    .taste-bar {
+      display: flex;
+      margin-top: 18rpx;
+      .tast-item {
+        font-size: 26rpx;
+        color: #666;
+        border-radius: 40rpx;
+        margin-left: 20rpx;
+        padding: 12rpx 40rpx;
+        background-color: #f2f2f2;
+        &.active {
+          background-color: #ff7200;
+          color: #fff;
+        }
+      }
+    }
+  }
+  .quantity {
+    padding: 28rpx 50rpx;
+    display: flex;
+    justify-content: space-between;
+    .title {
+      color: #666;
+      font-size: 28rpx;
+      margin-top: 15rpx;
+    }
+    .quantity-bar {
+      width: 184rpx;
+      height: 48rpx;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      image {
+        width: 48rpx;
+        height: 48rpx;
+      }
+      .quantity-view {
+        color: #666;
+        font-size: 32rpx;
+      }
+    }
+  }
+}
+</style>

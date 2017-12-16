@@ -1,0 +1,337 @@
+<template>
+  <view class="container">
+    <scroll-view scroll-y class="confirmation-scroll" style="height: {{list_height.height}}px">
+      <view class="confirmation">
+        <view class="order-number">订单编号：20172513151351</view>
+          <view class="confirmation-bar">
+            <view class="confirmation-header">
+              <image src="/images/make_big.png"></image>
+              <view class="title">菜品制作中</view>
+              <view class="small">厨房正在为您火速准备菜品</view>
+              <view class="time">{{time.hour}} <text class="vertical-center">:</text> {{time.minute}} <text class="vertical-center">:</text> {{time.second}}</view>
+              <circle class="circle"/>
+            </view>
+            <view class="confirmation-main">
+              <view class="title">
+                下单时间：2017.10.25 15:25
+              </view>
+              <view class="list">
+                <view class="item">
+                  <view class="item-name">
+                    招牌经典牛排
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left">微辣</view>
+                    <view class="text-center">x1</view>
+                    <view class="text-right">￥98.5</view>
+                  </view>
+                </view>
+                <view class="item">
+                  <view class="item-name">
+                    招牌经典牛排拉面
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left">微辣</view>
+                    <view class="text-center">x1</view>
+                    <view class="text-right">￥98.5</view>
+                  </view>
+                </view>
+                <view class="item">
+                  <view class="item-name">
+                    招牌经典牛排
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left">微辣</view>
+                    <view class="text-center">x1</view>
+                    <view class="text-right">￥98.5</view>
+                  </view>
+                </view>
+                <view class="item">
+                  <view class="item-name">
+                    招牌牛排
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left">微辣</view>
+                    <view class="text-center">x1</view>
+                    <view class="text-right">￥98.5</view>
+                  </view>
+                </view>
+                <view class="item">
+                  <view class="item-name">
+                    招牌经典牛排
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left"></view>
+                    <view class="text-center">x1</view>
+                    <view class="text-right">￥98.5</view>
+                  </view>
+                </view>
+                <view class="item">
+                  <view class="item-name">
+                    招牌经典牛排粉肠
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left">微辣</view>
+                    <view class="text-center">x1</view>
+                    <view class="text-right">￥98.5</view>
+                  </view>
+                </view>
+                <view class="item divide">
+                  <view class="item-name">
+                    菜品原价
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left"></view>
+                    <view class="text-center"></view>
+                    <view class="text-right">￥1000</view>
+                  </view>
+                </view>
+                <view class="item">
+                  <view class="item-name">
+                    -优惠
+                  </view>
+                  <view class="item-option-bar">
+                    <view class="text-left"></view>
+                    <view class="text-center"></view>
+                    <view class="text-right">￥200</view>
+                  </view>
+                </view>
+              </view>
+            </view>
+            <view class="confirmation-footer">
+              <view class="bold">实付款：</view>
+              <view class="price">￥800</view>
+            </view>
+          </view>
+      </view>
+    </scroll-view>
+    <view class="footer">
+      <button class="button button-primary" @tap="returnIndexPage">催单</button>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import store from '../store'
+import Circle from '../components/circle'
+export default class orderDetail extends wepy.page {
+  config = {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#252026',
+    navigationBarTitleText: '下单成功',
+    navigationBarTextStyle: '#ffffff'
+  }
+  components = {
+    circle: Circle
+  }
+  data = {
+    list_height: {
+      height: Math.ceil(
+        store.state.windowHeight - store.state.windowWidth / 750 * 97
+      )
+    },
+    time: {
+      hour: 0,
+      minute: 0,
+      second: 0,
+      passTime: 0
+    }
+  }
+
+  watch = {
+    time(val) {
+      let hour = (val.passTime / 3600) | 0
+      let minute = ((val.passTime / 60) | 0) % 60
+      let second = val.passTime % 60
+      this.time.hour = hour < 10 ? '0' + hour : hour
+      this.time.minute = minute < 10 ? '0' + minute : minute
+      this.time.second = second < 10 ? '0' + second : second
+    }
+  }
+  onLoad() {
+    let that = this
+    function timer(time) {
+      let startTime = (new Date(time).getTime() / 1000) | 0
+      setInterval(() => {
+        let newTime = (new Date().getTime() / 1000) | 0
+        that.time.passTime = newTime - startTime
+        that.$apply()
+      }, 1000)
+    }
+    timer(1512112025000)
+  }
+
+  methods = {
+    returnIndexPage() {
+      wx.showNavigationBarLoading()
+      setTimeout(() => {
+        wx.showToast({
+          title: '催单成功',
+          icon: 'success'
+        })
+        wx.hideNavigationBarLoading()
+      }, 1000)
+    },
+    settleAccounts() {
+      console.log('settleAccounts')
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.confirmation-scroll {
+  background-color: #f2f2f2;
+}
+.confirmation {
+  padding: 60rpx;
+  box-sizing: border-box;
+  .order-number {
+    padding-left: 15rpx;
+    font-size: 28rpx;
+    color: #666;
+  }
+  .confirmation-bar {
+    padding: 8rpx 15rpx 0;
+    margin-top: 15rpx;
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 16rpx;
+      display: block;
+      background-color: #ff7200;
+      border-radius: 8rpx;
+    }
+    .confirmation-header {
+      background-color: #fff;
+      padding: 50rpx 0 80rpx;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 332rpx;
+      position: relative;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.07);
+      .circle {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -10rpx;
+      }
+      & > image {
+        width: 100rpx;
+        height: 100rpx;
+      }
+      .title {
+        font-size: 28rpx;
+        color: #ff7200;
+      }
+      .small {
+        font-size: 30rpx;
+        color: #666;
+      }
+      .time {
+        font-size: 62rpx;
+        color: #333;
+        margin-top: 20rpx;
+        font-weight: bold;
+        .vertical-center {
+          font-size: 80rpx;
+          transform: scale(0.8);
+          display: inline-block;
+        }
+      }
+    }
+    .confirmation-main {
+      margin-top: 20rpx;
+      .title {
+        padding-left: 10rpx;
+        padding-bottom: 25rpx;
+        font-size: 26rpx;
+        color: #666;
+        border-bottom: 1px solid #fff;
+      }
+      .list {
+        padding-left: 15rpx;
+        margin-top: 20rpx;
+        .item {
+          display: flex;
+          justify-content: space-between;
+          padding-bottom: 20rpx;
+          &.divide {
+            padding-top: 20rpx;
+            border-top: 1px solid #fff;
+          }
+          .item-name {
+            flex: 3;
+            color: #666;
+            font-size: 26rpx;
+          }
+          .item-option-bar {
+            flex: 2;
+            display: flex;
+            justify-content: space-between;
+            & > view {
+              flex: 1;
+              color: #666;
+              font-size: 26rpx;
+            }
+          }
+        }
+      }
+    }
+    .confirmation-footer {
+      padding-top: 10rpx;
+      display: flex;
+      justify-content: flex-end;
+      .bold {
+        font-size: 26rpx;
+        color: #666;
+        font-weight: bold;
+      }
+      .price {
+        font-size: 26rpx;
+        color: #ff7200;
+        font-weight: bold;
+      }
+    }
+  }
+}
+.footer {
+  width: 100%;
+  height: 97rpx;
+  display: flex;
+  .button {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid #eee;
+    font-size: 32rpx;
+    border-radius: 0;
+    line-height: 97rpx;
+    color: #333;
+    &::after {
+      content: none;
+    }
+    &.button-primary {
+      border: 0;
+      background-color: #ff7200;
+      color: #fff;
+    }
+  }
+}
+
+.text-left {
+  text-align: left;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+</style>
